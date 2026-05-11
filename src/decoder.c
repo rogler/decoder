@@ -62,29 +62,53 @@ int main(int argc, char** argv)
 	argumentOffset = 0;
 #else
 	char 				enameLong[PATH_MAX+1];
-	size_t				linkSize;
 
-	if ((linkSize = readlink("/proc/self/exe", enameLong, PATH_MAX)) == (size_t) -1)
-	{
-		errorMessage(errorExecutableName);
-		exit(EXIT_FAILURE);
-	}
+#if defined(__APPLE__)
 
-	enameLong[PATH_MAX] = 0;
-	enameLong[linkSize] = 0;
-	if (argumentCount == 0)
-	{
-		errorMessage(errorInvocationName);
-		exit(EXIT_FAILURE);
-	}
-	ename = basename(strdup(enameLong));
-	fname = basename(strdup(arguments[0]));
+        uint32_t pathSize = sizeof(enameLong);
 
-	if (strcmp(ename, fname))
-	{
-		argumentOffset = 0;		
-	}
-	else
+        if (_NSGetExecutablePath(enameLong, &pathSize) != 0)
+        {
+                errorMessage(errorExecutableName);
+                exit(EXIT_FAILURE);
+        }
+
+        enameLong[PATH_MAX] = '\0';
+
+#else
+
+        ssize_t linkSize;
+
+        if ((linkSize = readlink("/proc/self/exe",
+                                 enameLong,
+                                 PATH_MAX)) == -1)
+        {
+                errorMessage(errorExecutableName);
+                exit(EXIT_FAILURE);
+        }
+
+        enameLong[linkSize] = '\0';
+
+#endif
+
+        if (argumentCount == 0)
+        {
+                errorMessage(errorInvocationName);
+                exit(EXIT_FAILURE);
+        }
+
+        ename = basename(strdup(enameLong));
+        fname = basename(strdup(arguments[0]));
+
+        if (strcmp(ename, fname))
+        {
+                argumentOffset = 0;
+        }
+        else
+        {
+                argumentOffset = 1;
+        }
+
 #endif
 	if (argumentCount > 1 && *(arguments[1]) != '-')
 	{

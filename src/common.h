@@ -28,7 +28,13 @@
 #define EXPORTED			__attribute__((__visibility__("default"), used, externally_visible))
 #define UNUSED				__attribute__((unused))
 
+#if defined(__APPLE__)
+#include <libgen.h>
+#include <string.h>
+#include <mach-o/dyld.h>
+#elif defined(__linux__)
 #include <unistd.h>
+#endif
 #include <stdlib.h>
 #include <stdbool.h>
 #include <ctype.h>
