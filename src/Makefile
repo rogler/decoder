@@ -357,7 +357,7 @@ endif
 #######################################################################################################
 project := decoder
 srcdir = .
-nettle_version = 3.8
+nettle_version = 3.10.2
 #######################################################################################################
 #                                                                                                     #
 # build settings from configuration above                                                             #
@@ -689,7 +689,11 @@ ifeq ($(DECODER_CONFIG_DEBUG),y)
 override CFLAGS += -O0 -ggdb -DDEBUG
 else
 override CFLAGS += -O2 -ffunction-sections -fdata-sections
-override LDFLAGS += -Wl,--gc-sections
+ifeq ($(shell uname),Darwin)
+    override LDFLAGS += -Wl,-dead_strip
+else
+    override LDFLAGS += -Wl,--gc-sections
+endif
 endif
 #######################################################################################################
 #                                                                                                     #

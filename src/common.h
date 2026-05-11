@@ -25,7 +25,13 @@
 
 #define _GNU_SOURCE
 
-#define EXPORTED			__attribute__((__visibility__("default"), used, externally_visible))
+#if defined(__GNUC__) && !defined(__clang__)
+# define EXPORTED \
+    __attribute__((__visibility__("default"), used, externally_visible))
+#else
+# define EXPORTED \
+    __attribute__((__visibility__("default"), used))
+#endif
 #define UNUSED				__attribute__((unused))
 
 #if defined(__APPLE__)
