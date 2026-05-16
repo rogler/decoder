@@ -328,6 +328,9 @@ ifeq "$(strip $(OPENSSL))" "y"
 DECODER_CONFIG_LIBNETTLE=n
 DECODER_CONFIG_LINK_STATIC=n
 endif
+ifeq ($(shell uname),Darwin)
+    DECODER_CONFIG_LINK_STATIC=n
+endif
 #######################################################################################################
 #                                                                                                     #
 # use OpenSSL or Nettle library                                                                       #
